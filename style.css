@@ -4,3 +4,16 @@ body {
   background-color: black;
   color: white;
 }
+
+a {
+  color: white;
+  text-decoration: underline; /* 밑줄은 원하면 유지 */
+}
+
+a:visited {
+  color: white; /* 방문한 링크도 흰색 */
+}
+
+a:hover {
+  color: gray; /* 마우스 올렸을 때 회색으로 바꾸고 싶으면 */
+}
