@@ -1,0 +1,172 @@
+<style>
+#leadForm {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 30px;
+  border-radius: 0;
+  background: #f7f7f7;
+  font-family: 'Pretendard', sans-serif;
+}
+#leadForm h2 {
+  font-size: 28px;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #222;
+}
+#leadForm input,
+#leadForm select {
+  width: 100%;
+  padding: 24px;
+  margin-top: 12px;
+  margin-bottom: 25px;
+  border: 2px solid #555;
+  border-radius: 10px;
+  font-size: 24px;
+  box-sizing: border-box;
+}
+@keyframes blink {
+  0%   {background: #014bbb;}
+  50%  {background: #45a049;}
+  100% {background: #014bbb;}
+}
+#leadForm button {
+  width: 100%;
+  background: #014bbb;
+  color: #fff;
+  font-size: 24px;
+  padding: 30px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  animation: blink 2s infinite;
+}
+#leadForm button:hover {
+  background: #45a049;
+}
+#leadForm button:active {
+  background: #2196F3;
+}
+#leadForm .agreement {
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+#leadForm .agreement label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#leadForm .agreement input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+#leadForm .agreement a {
+  color: #014bbb;
+  text-decoration: underline;
+}
+#result {
+  margin-top: 20px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* 모바일 대응 */
+@media screen and (max-width: 640px) {
+  #leadForm h2 {
+    font-size: 20px;
+  }
+  #leadForm input,
+  #leadForm select {
+    font-size: 22px;
+    padding: 16px;
+  }
+  #leadForm button {
+    font-size: 20px;
+    padding: 20px;
+  }
+}
+</style>
+
+<form id="leadForm">
+  <h2>혜택 안내를 위해<br>성함과 연락처를 남겨주세요!</h2>
+  <div>
+    <label>
+      이름<br>
+      <input type="text" name="name" required placeholder="이름을 입력하세요">
+    </label>
+  </div>
+  <div>
+    <label>
+      전화번호<br>
+      <input type="tel" name="phone" required placeholder="010-0000-0000" maxlength="13" pattern="\d{3}-\d{4}-\d{4}">
+    </label>
+  </div>
+  <div>
+    <label>
+      임플란트 필요 개수<br>
+      <select name="implants">
+        <option value="">선택하세요</option>
+        <option value="4개 이하">4개 이하</option>
+        <option value="5개">5개</option>
+        <option value="6개 이상" selected>6개 이상</option>
+        <option value="전체">전체</option>
+      </select>
+    </label>
+  </div>
+  <div class="agreement">
+    <label>
+      <input type="checkbox" name="privacy" checked required>
+      <span>
+        <a href="https://www.implantevent.com/privacy" target="_blank">개인정보처리방침</a>에 동의합니다.
+      </span>
+    </label>
+  </div>
+  <button type="submit">이벤트 신청하기</button>
+</form>
+<div id="result"></div>
+
+<script>
+// 하이픈 자동입력
+const phoneInput = document.querySelector('input[name="phone"]');
+phoneInput.addEventListener('input', function(e) {
+  let numbers = e.target.value.replace(/\D/g, '');
+  if (numbers.length > 11) numbers = numbers.slice(0, 11);
+  let formatted = '';
+  if (numbers.length < 4) {
+    formatted = numbers;
+  } else if (numbers.length < 8) {
+    formatted = numbers.slice(0,3) + '-' + numbers.slice(3);
+  } else {
+    formatted = numbers.slice(0,3) + '-' + numbers.slice(3,7) + '-' + numbers.slice(7);
+  }
+  e.target.value = formatted;
+});
+
+document.getElementById('leadForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  // 개인정보 동의 체크
+  if (!this.privacy.checked) {
+    alert('개인정보처리방침에 동의해 주세요.');
+    return;
+  }
+
+  const formData = new URLSearchParams();
+  formData.append('name', this.name.value);
+  formData.append('phone', this.phone.value);
+  formData.append('implants', this.implants.value);
+
+  fetch('https://script.google.com/macros/s/AKfycbzNyxO10Kya8dbJfxwAMXVM-xbh1mVKUIK_Hf5LYDrD87u3lkA7lBpslDsv4YFbElR5jA/exec', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.text())
+  .then(text => {
+    window.location.href = "https://www.implantevent.com/complete";
+  })
+  .catch(err => {
+    console.error(err);
+    document.getElementById('result').innerText = '❌ 전송 실패. 다시 시도해 주세요.';
+  });
+});
+</script>
